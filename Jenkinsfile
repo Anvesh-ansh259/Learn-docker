@@ -53,6 +53,12 @@ pipeline {
     }
 
     post {
+        success {
+            echo "\u2705 Build finished successfully! All stages passed."
+        }
+        failure {
+            echo "\u274C Build failed! Check the logs above for errors."
+        }
         always {
             echo 'Pipeline finished.'
         }
