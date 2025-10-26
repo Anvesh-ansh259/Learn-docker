@@ -1,0 +1,57 @@
+pipeline {
+    agent { label 'dockeragent' }
+
+    environment {
+        IMAGE_NGINX = 'anveshansh259/nginx-app'
+        IMAGE_PYTHON = 'anveshansh259/python-app'
+        IMAGE_NODE = 'anveshansh259/nodejs-app'
+        GIT_REPO = 'https://github.com/Anvesh-ansh259/Learn-docker.git'
+        BRANCH = 'main'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: "${BRANCH}",
+                    url: "${GIT_REPO}"
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub_token', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    sh 'docker build -t $IMAGE_NGINX ./nginx-app'
+                    sh 'docker build -t $IMAGE_PYTHON ./python-app'
+                    sh 'docker build -t $IMAGE_NODE ./nodejs-app'
+                }
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                script {
+                    sh 'docker push $IMAGE_NGINX'
+                    sh 'docker push $IMAGE_PYTHON'
+                    sh 'docker push $IMAGE_NODE'
+                    sh 'docker logout'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished.'
+        }
+    }
+}
