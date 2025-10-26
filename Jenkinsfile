@@ -9,17 +9,7 @@ pipeline {
         IMAGE_NODE = 'anveshansh259/nodejs-app'
     }
 
-    options {
-        ansiColor('xterm')
-    }
-
     stages {
-        stage('Start') {
-            steps {
-                echo "\u2705 Pipeline Started"
-            }
-        }
-
         stage('Checkout Code') {
             steps {
                 git branch: "${BRANCH}",
@@ -64,10 +54,10 @@ pipeline {
 
     post {
         success {
-            echo "\u2705 Build finished successfully! ✅ All stages passed."
+            echo "\u2705 Build finished successfully! All stages passed."
         }
         failure {
-            echo "\u274C Build failed! ❌ Check the logs above."
+            echo "\u274C Build failed! Check the logs above for errors."
         }
         always {
             echo 'Pipeline finished.'
