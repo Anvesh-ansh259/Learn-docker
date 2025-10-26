@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'dockeragent' }
+    agent any
 
     environment {
         GIT_REPO = 'https://github.com/Anvesh-ansh259/Learn-docker.git'
