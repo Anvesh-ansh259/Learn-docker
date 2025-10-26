@@ -20,34 +20,51 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub_token', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh """
-                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        """
-                    }
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_token', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
                 }
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Build Nginx Image') {
             steps {
-                script {
-                    sh "docker build -t ${IMAGE_NGINX} ./nginx-app"
-                    sh "docker build -t ${IMAGE_PYTHON} ./python-app"
-                    sh "docker build -t ${IMAGE_NODE} ./nodejs-app"
-                }
+                sh "docker build -t ${IMAGE_NGINX} ./nginx-app"
             }
         }
 
-        stage('Push Docker Images') {
+        stage('Build Python Image') {
             steps {
-                script {
-                    sh "docker push ${IMAGE_NGINX}"
-                    sh "docker push ${IMAGE_PYTHON}"
-                    sh "docker push ${IMAGE_NODE}"
-                    sh "docker logout"
-                }
+                sh "docker build -t ${IMAGE_PYTHON} ./python-app"
+            }
+        }
+
+        stage('Build NodeJS Image') {
+            steps {
+                sh "docker build -t ${IMAGE_NODE} ./nodejs-app"
+            }
+        }
+
+        stage('Push Nginx Image') {
+            steps {
+                sh "docker push ${IMAGE_NGINX}"
+            }
+        }
+
+        stage('Push Python Image') {
+            steps {
+                sh "docker push ${IMAGE_PYTHON}"
+            }
+        }
+
+        stage('Push NodeJS Image') {
+            steps {
+                sh "docker push ${IMAGE_NODE}"
+            }
+        }
+
+        stage('Docker Logout') {
+            steps {
+                sh "docker logout"
             }
         }
     }
